@@ -25,24 +25,15 @@ class MyGame extends engine.Scene {
         //   H: Player drive brain
         //   J: Dye drive brain, immediate orientation change
         //   K: Dye drive brain, gradual orientation change
-        this.mMode = 'H';
         this.dialogFile = "assets/dialog3.json";
         this.dialogFileGreen = "assets/dialoggreen.json";
         this.dialogFileGreen2 = "assets/dialoggreen2.json";
         this.mTextScrollBeep = "assets/sounds/beep.wav";
-        this.mEvilBeep = "assets/sounds/evilbeep.wav";
-        this.mEvilLaugh = "assets/sounds/evilaugh.wav";
         this.mNextArrow = "assets/nextbutton.png";
-
-        this.kFontSeg96 = "assets/fonts/segment7-96";
-        this.mTextSeg96 = null;
-
         this.kHeroSprite = "assets/stupidtownhero.png";
 
         this.mCurrentDialog = null;
-
         this.touchedEvil = false;
-
         this.vanquished = false;
 
         // textbox style
@@ -51,67 +42,56 @@ class MyGame extends engine.Scene {
     }
 
     load() {
-        engine.font.load(this.kFontSeg96);
         engine.texture.load(this.kHeroSprite);
         engine.json.load(this.dialogFile);    
         engine.json.load(this.dialogFileGreen);
         engine.json.load(this.dialogFileGreen2);
-        //engine.texture.load(this.heroTalkingSprite);
-        //engine.texture.load(this.otherguyTalkingSprite);
         engine.texture.load(this.mNextArrow);
         engine.audio.load(this.mTextScrollBeep);
-        engine.audio.load(this.mEvilBeep);
-        engine.audio.load(this.mEvilLaugh);
 
         engine.texture.load(this.textBoxStyleTexture);
     }
 
     unload() {
         engine.texture.unload(this.kHeroSprite);
-        engine.texture.unload(this.heroTalkingSprite);
-        engine.texture.unload(this.otherguyTalkingSprite);
         engine.texture.unload(this.mNextArrow);
         engine.json.unload(this.dialogFile);    
         engine.json.unload(this.dialogFileGreen);
         engine.json.unload(this.dialogFileGreen2);
         engine.audio.unload(this.mTextScrollBeep);
-        engine.audio.unload(this.mEvilBeep);
-        engine.audio.unload(this.mEvilLaugh);
-        engine.font.unload(this.kFontSeg96);
-
         engine.texture.unload(this.textBoxStyleTexture);
+
+        let jsons = [engine.json.get(this.dialogFile),
+            engine.json.get(this.dialogFileGreen),
+            engine.json.get(this.dialogFileGreen2)];
+        
+        for(let i = 0; i < jsons.length; i++) {
+            let lines = jsons[i]["DialogLine"]
+            for(let j = 0; j < lines.length; j++) {
+                engine.texture.unload(lines[i]["SpritePath"]);
+                engine.font.unload(lines[j]["NameFont"]);
+                engine.font.unload(lines[j]["ContentFont"]);
+                engine.audio.unload(lines[j]["ScrollAudio"]);
+                engine.audio.unload(lines[j]["LineAudio"]);
+            }
+        }
     }
 
     init() {
         // Automated loading
-        let json = engine.json.get(this.dialogFile);
-        let lines = json["DialogLine"]
-        for(let i = 0; i < lines.length; i++) {
-            engine.texture.load(lines[i]["SpritePath"]);
-            engine.font.load(lines[i]["NameFont"]);
-            engine.font.load(lines[i]["ContentFont"]);
-            engine.audio.load(lines[i]["ScrollAudio"]);
-            engine.audio.load(lines[i]["LineAudio"]);
-        }
+        let jsons = [engine.json.get(this.dialogFile),
+            engine.json.get(this.dialogFileGreen),
+            engine.json.get(this.dialogFileGreen2)];
         
-        json = engine.json.get(this.dialogFileGreen);
-        lines = json["DialogLine"]
-        for(let i = 0; i < lines.length; i++) {
-            engine.texture.load(lines[i]["SpritePath"]);
-            engine.font.load(lines[i]["NameFont"]);
-            engine.font.load(lines[i]["ContentFont"]);
-            engine.audio.load(lines[i]["ScrollAudio"]);
-            engine.audio.load(lines[i]["LineAudio"]);
-        }
-
-        json = engine.json.get(this.dialogFileGreen2);
-        lines = json["DialogLine"]
-        for(let i = 0; i < lines.length; i++) {
-            engine.texture.load(lines[i]["SpritePath"]);
-            engine.font.load(lines[i]["NameFont"]);
-            engine.font.load(lines[i]["ContentFont"]);
-            engine.audio.load(lines[i]["ScrollAudio"]);
-            engine.audio.load(lines[i]["LineAudio"]);
+        for(let i = 0; i < jsons.length; i++) {
+            let lines = jsons[i]["DialogLine"]
+            for(let j = 0; j < lines.length; j++) {
+                engine.texture.load(lines[i]["SpritePath"]);
+                engine.font.load(lines[j]["NameFont"]);
+                engine.font.load(lines[j]["ContentFont"]);
+                engine.audio.load(lines[j]["ScrollAudio"]);
+                engine.audio.load(lines[j]["LineAudio"]);
+            }
         }
 
         // Step A: set up the cameras
